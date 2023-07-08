@@ -1,27 +1,28 @@
 package hexlet.code;
 
 import io.ebean.Model;
-
-import javax.annotation.processing.Generated;
+import io.ebean.annotation.WhenCreated;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.Instant;
+
 
 @Entity
 public class Url extends Model {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
     private long id;
 
     private String name;
 
-    private LocalDateTime createdAt;
+    @WhenCreated
+    private Instant createdAt;
 
     public Url() {
-        this.createdAt = LocalDateTime.now();
+    }
+
+    public Url(String name) {
+        this.name = name;
     }
 
     public Long getId() {
@@ -32,11 +33,7 @@ public class Url extends Model {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }
