@@ -3,7 +3,7 @@ plugins {
     id 'application'
     id 'checkstyle'
     id 'jacoco'
-    id 'io.ebean' version '12.11.5'
+    id 'io.ebean' version '13.17.4'
 }
 
 group 'hexlet.code'
@@ -18,11 +18,12 @@ application {
 }
 
 compileJava {
-    options.release = 17
+    options.release = 20
 }
 
 dependencies {
     implementation 'io.javalin:javalin:5.5.0'
+    implementation 'io.javalin:javalin-rendering:5.5.0'
     implementation 'org.slf4j:slf4j-simple:2.0.5'
 
     implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
@@ -44,8 +45,27 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.5'
     implementation 'javax.activation:activation:1.1.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testImplementation 'org.assertj:assertj-core:3.24.0'
+    testImplementation 'io.ebean:ebean-test:13.15.0'
+    testImplementation 'com.konghq:unirest-java:3.14.2'
+}
+
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+//testlogger {
+//    showStandardStreams true
+//}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
 }
 
 task stage(dependsOn: ['clean', 'installDist'])
@@ -56,7 +76,6 @@ task generateMigrations(type: JavaExec) {
     mainClass = 'hexlet.code.MigrationGenerator'
 }
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
+checkstyle {
+    toolVersion '10.12.1'
 }
