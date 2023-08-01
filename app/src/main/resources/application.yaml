@@ -13,6 +13,7 @@ ebean:
   development:
     migration:
       run: true
+      seedSql: seed.sql
   production:
     migration:
       run: true

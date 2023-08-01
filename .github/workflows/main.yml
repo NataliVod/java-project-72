@@ -50,6 +50,6 @@ deploy:
       with:
         context: .
         push: true
-        cache-from: ljhhome/java-project-72:latest
+        cache-from: NataliVod/java-project-72:latest
         cache-to: type=inline
-        tags: ljhhome/java-project-72:latest
+        tags: NataliVod/java-project-72:latest

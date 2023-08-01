@@ -33,9 +33,7 @@ public final class App {
 
         addRoutes(app);
 
-        app.before(ctx -> {
-            ctx.attribute("ctx", ctx);
-        });
+        app.before(ctx -> ctx.attribute("ctx", ctx));
 
         return app;
 
@@ -67,17 +65,11 @@ public final class App {
 
         app.get("/", RootController.welcome);
 
-        app.routes(() -> {
-            path("urls", () -> {
-                get(UrlController.listUrls);
-                post(UrlController.createUrl);
-                path("{id}", () -> {
-                    get(UrlController.showUrl);
-                });
-            });
-        });
-
-
+        app.routes(() -> path("urls", () -> {
+            get(UrlController.listUrls);
+            get("/{id}", UrlController.showUrl);
+            post(UrlController.createUrl);
+        }));
 
     }
 }

@@ -51,16 +51,18 @@ public  class UrlController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect("/urls");
+            ctx.redirect("/");
             return;
         }
         String baseUrl = notmalizedUrl.getProtocol() + "://" + notmalizedUrl.getHost();
         Url url = new Url(baseUrl);
-        url.save();
+        if (url != null) {
 
-        ctx.sessionAttribute("flash", "Страница успешно добавлена");
-        ctx.sessionAttribute("flash-type", "success");
-        ctx.redirect("/urls");
+            url.save();
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.redirect("/urls");
+        }
     };
 
     public static Handler showUrl = ctx -> {
