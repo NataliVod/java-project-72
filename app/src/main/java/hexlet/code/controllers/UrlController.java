@@ -14,12 +14,10 @@ import java.net.URL;
 
 public  class UrlController {
     public static Handler listUrls = ctx -> {
-        String term = ctx.queryParamAsClass("term", String.class).getOrDefault("");
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
         int rowsPerPage = 10;
 
         PagedList<Url> pagedUrls = new QUrl()
-                .name.icontains(term)
                 .setFirstRow(page * rowsPerPage)
                 .setMaxRows(rowsPerPage)
                 .orderBy()
@@ -36,7 +34,6 @@ public  class UrlController {
                 .collect(Collectors.toList());
 
         ctx.attribute("urls", urls);
-        ctx.attribute("term", term);
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
         ctx.render("urls/index.html");
@@ -51,7 +48,7 @@ public  class UrlController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect("/");
+            ctx.redirect("/urls");
             return;
         }
         String baseUrl = notmalizedUrl.getProtocol() + "://" + notmalizedUrl.getHost();
