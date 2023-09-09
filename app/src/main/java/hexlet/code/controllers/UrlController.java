@@ -1,79 +1,78 @@
 package hexlet.code.controllers;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import hexlet.code.domain.Url;
-import hexlet.code.domain.query.QUrl;
-import io.ebean.PagedList;
-import io.javalin.http.Handler;
+import hexlet.code.dto.urls.UrlPage;
+import hexlet.code.dto.urls.UrlsPage;
+import hexlet.code.model.Url;
+import hexlet.code.repository.UrlRepository;
+import hexlet.code.util.NamedRoutes;
+
+import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 
 import java.net.URL;
 
 public  class UrlController {
-    public static Handler listUrls = ctx -> {
-        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
-        int rowsPerPage = 10;
-
-        PagedList<Url> pagedUrls = new QUrl()
-                .setFirstRow(page * rowsPerPage)
-                .setMaxRows(rowsPerPage)
-                .orderBy()
-                .id.asc()
-                .findPagedList();
-
-        List<Url> urls = pagedUrls.getList();
-
-        int lastPage = pagedUrls.getTotalPageCount() + 1;
-        int currentPage = pagedUrls.getPageIndex() + 1;
-        List<Integer> pages = IntStream
-                .range(1, lastPage)
-                .boxed()
-                .collect(Collectors.toList());
-
-        ctx.attribute("urls", urls);
-        ctx.attribute("pages", pages);
-        ctx.attribute("currentPage", currentPage);
-        ctx.render("urls/index.html");
-    };
-
-
-    public static Handler createUrl = ctx -> {
-        String inputUrl = ctx.formParam("url");
-        URL notmalizedUrl;
+    public static void addUrl(Context ctx) throws SQLException {
+        URL parsedUrl;
         try {
-            notmalizedUrl = new URL(inputUrl);
+            var inputUrl = ctx.formParamAsClass("url", String.class)
+                    .check(value -> !value.isEmpty(), "Заполните это поле")
+                    .get();
+
+            parsedUrl = new URL(inputUrl);
+            var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost();
+            Url url = new Url(normalizedUrl);
+
+            if (UrlRepository.existsByName(url.getName())) {
+                ctx.sessionAttribute("flash", "Страница уже существует");
+                ctx.sessionAttribute("flash-type", "info");
+                ctx.redirect(NamedRoutes.urlsPath());
+            }
+
+            UrlRepository.save(url);
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+
+            ctx.redirect(NamedRoutes.urlsPath());
+
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect("/urls");
-            return;
+            ctx.redirect(NamedRoutes.rootPath());
         }
-        String baseUrl = notmalizedUrl.getProtocol() + "://" + notmalizedUrl.getHost();
-        Url url = new Url(baseUrl);
-        if (url != null) {
+    }
 
-            url.save();
-            ctx.sessionAttribute("flash", "Страница успешно добавлена");
-            ctx.sessionAttribute("flash-type", "success");
-            ctx.redirect("/urls");
-        }
-    };
+    public static void showUrls(Context ctx) throws SQLException {
+        var urls = UrlRepository.getEntities();
+        var pageNumber = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
+        var per = 10;
+        var firstPost = (pageNumber - 1) * per  ;
+        List<Url> pagedUrls;
 
-    public static Handler showUrl = ctx -> {
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
-
-        Url url = new QUrl()
-                .id.equalTo(id)
-                .findOne();
-
-        if (url == null) {
-            throw new NotFoundResponse();
+        try {
+            pagedUrls = urls.subList(firstPost, firstPost + per);
+        } catch (IndexOutOfBoundsException e) {
+            pagedUrls = new ArrayList<>();
         }
 
-        ctx.attribute("url", url);
-        ctx.render("urls/show.html");
-    };
+        var page = new UrlsPage(pagedUrls,pageNumber);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
+        ctx.render("urls/index.jte", Collections.singletonMap("page", page));
+    }
+
+    public static void showUrl(Context ctx) throws SQLException {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.find(id)
+                .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
+        var page = new UrlPage(url);
+        ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+    }
+
 }
