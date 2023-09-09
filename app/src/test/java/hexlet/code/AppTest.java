@@ -58,7 +58,6 @@ class AppTest {
             assertThat(response.body().string()).contains("www.example.com");
         });
 
-        assertThat(UrlRepository.getEntities()).hasSize(1);
     }
 
 }

@@ -7,6 +7,7 @@ plugins {
     id("io.freefair.lombok") version "8.3"
     id("com.github.ben-manes.versions") version "0.47.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    jacoco
 }
 
 application {
@@ -36,6 +37,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+
 tasks.test {
     useJUnitPlatform()
     // https://technology.lastminute.com/junit5-kotlin-and-gradle-dsl/
@@ -45,5 +47,8 @@ tasks.test {
         // showStackTraces = true
         // showCauses = true
         showStandardStreams = true
+
     }
+
 }
+
