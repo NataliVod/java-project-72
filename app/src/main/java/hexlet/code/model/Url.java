@@ -21,8 +21,11 @@ public class Url {
     public Url() {}
 
 
-    public Url(String name) {
-            this.name = name;
+    public Url(String name, Timestamp createdAt) {
+
+        this.name = name;
+        this.createdAt = createdAt;
+
         }
 }
 

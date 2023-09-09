@@ -32,9 +32,9 @@ check-updates:
 	./gradlew dependencyUpdates
 
 image-build:
-	docker build -t ljhhome/java-project-72:latest .
+	docker build -t NataliVod/java-project-72:latest .
 
 image-push:
-	docker push ljhhome/java-project-72:latest
+	docker push NataliVod/java-project-72:latest
 
 .PHONY: build

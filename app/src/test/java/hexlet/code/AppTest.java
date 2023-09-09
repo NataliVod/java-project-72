@@ -7,6 +7,8 @@ import io.javalin.testtools.JavalinTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AppTest {
@@ -38,7 +40,8 @@ class AppTest {
 
     @Test
     public void testUrlPage() throws Exception {
-        var url = new Url("www.example.com");
+        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+        var url = new Url("www.example.com", createdAt);
         UrlRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());

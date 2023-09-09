@@ -1,6 +1,7 @@
 package hexlet.code.controllers;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,29 +16,31 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 
 import java.net.URL;
+import java.util.stream.Collectors;
 
 public  class UrlController {
     public static void addUrl(Context ctx) throws SQLException {
-        URL parsedUrl;
+
         try {
             var inputUrl = ctx.formParamAsClass("url", String.class)
-                    .check(value -> !value.isEmpty(), "Заполните это поле")
-                    .get();
+                   .check(value -> !value.isEmpty(), "Заполните это поле")
+                   .get();
 
-            parsedUrl = new URL(inputUrl);
+            URL parsedUrl = new URL(inputUrl);
             var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost();
-            Url url = new Url(normalizedUrl);
 
-            if (UrlRepository.existsByName(url.getName())) {
+            if (UrlRepository.existsByName(normalizedUrl)) {
                 ctx.sessionAttribute("flash", "Страница уже существует");
                 ctx.sessionAttribute("flash-type", "info");
                 ctx.redirect(NamedRoutes.urlsPath());
             }
 
+            Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+            Url url = new Url(normalizedUrl, createdAt);
             UrlRepository.save(url);
+
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.sessionAttribute("flash-type", "success");
-
             ctx.redirect(NamedRoutes.urlsPath());
 
         } catch (Exception e) {
@@ -52,13 +55,12 @@ public  class UrlController {
         var pageNumber = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
         var per = 10;
         var firstPost = (pageNumber - 1) * per  ;
-        List<Url> pagedUrls;
 
-        try {
-            pagedUrls = urls.subList(firstPost, firstPost + per);
-        } catch (IndexOutOfBoundsException e) {
-            pagedUrls = new ArrayList<>();
-        }
+        List<Url> pagedUrls = urls.stream()
+                .skip(firstPost)
+                .limit(per)
+                .collect(Collectors.toList());
+
 
         var page = new UrlsPage(pagedUrls,pageNumber);
         page.setFlash(ctx.consumeSessionAttribute("flash"));

@@ -1,76 +1,92 @@
 package hexlet.code;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
+
 import hexlet.code.controllers.RootController;
 import hexlet.code.controllers.UrlController;
+import hexlet.code.repository.BaseRepository;
+import hexlet.code.util.NamedRoutes;
+
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
 
-import io.javalin.rendering.template.JavalinThymeleaf;
-import org.thymeleaf.TemplateEngine;
-import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import lombok.extern.slf4j.Slf4j;
 
-import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.path;
-import static io.javalin.apibuilder.ApiBuilder.post;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.SQLException;
+import java.util.stream.Collectors;
 
-
+@Slf4j
 public final class App {
-    public static void main(String[] args) {
-        Javalin app = getApp();
-        app.start(8080);
-    }
 
-    private static Javalin getApp() {
-
-        Javalin app = Javalin.create(config -> {
-            if (!isProduction()) {
-                config.plugins.enableDevLogging();
-            }
-
-            JavalinThymeleaf.init(getTemplateEngine());
-        });
-
-        addRoutes(app);
-
-        app.before(ctx -> ctx.attribute("ctx", ctx));
-
-        return app;
-
+    private static int getPort() {
+        String port = System.getenv()
+                .getOrDefault("PORT", "7070");
+        return Integer.valueOf(port);
     }
 
     private static String getMode() {
-        return System.getenv().getOrDefault("APP_ENV", "development");
+        String dataBase = System.getenv()
+                .getOrDefault("JDBC_DATABASE_URL"
+                        , "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        return dataBase;
     }
 
-    private static boolean isProduction() {
-        return getMode().equals("production");
+
+    public static void main(String[] args) throws SQLException, IOException {
+        Javalin app = getApp();
+        app.start(getPort() );
     }
 
-    private static TemplateEngine getTemplateEngine() {
-        TemplateEngine templateEngine = new TemplateEngine();
-
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("/templates/");
-        templateResolver.setCharacterEncoding("UTF-8");
-
-        templateEngine.addTemplateResolver(templateResolver);
-        templateEngine.addDialect(new LayoutDialect());
-        templateEngine.addDialect(new Java8TimeDialect());
-
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("jte", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
         return templateEngine;
     }
 
-    private static void addRoutes(Javalin app) {
+    public static Javalin getApp() throws IOException, SQLException {
 
-        app.get("/", RootController.welcome);
+        JavalinJte.init(createTemplateEngine());
 
-        app.routes(() -> path("urls", () -> {
-            get(UrlController.listUrls);
-            get("/{id}", UrlController.showUrl);
-            post(UrlController.createUrl);
-        }));
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(getMode());
 
+        var dataSource = new HikariDataSource(hikariConfig);
+        var url = App.class.getClassLoader().getResource("schema.sql");
+        var file = new File(url.getFile());
+        var sql = Files.lines(file.toPath())
+                .collect(Collectors.joining("\n"));
+
+        log.info(sql);
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+        BaseRepository.dataSource = dataSource;
+
+        var app = Javalin.create(config -> {
+            config.plugins.enableDevLogging();
+        });
+
+        app.before(ctx -> {
+            ctx.contentType("text/html; charset=utf-8");
+        });
+
+        app.get(NamedRoutes.rootPath(), RootController::index);
+        app.get(NamedRoutes.urlsPath(), UrlController::showUrls);
+        app.post(NamedRoutes.urlsPath(), UrlController::addUrl);
+        app.get(NamedRoutes.urlPath("{id}"), UrlController::showUrl);
+
+        return app;
     }
+
 }
 

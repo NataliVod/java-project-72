@@ -12,7 +12,6 @@ content = @`
     <h1>Сайты</h1>
 
     <table class="table table-bordered table-hover mt-3">
-
         <thead>
         <tr>
             <th class="col-1">ID</th>
@@ -28,22 +27,21 @@ content = @`
                     ${url.getId()}
                 </td>
                 <td>
-                    <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
+                    <a href="/urls/${url.getId()}">${url.getName()}</a>
                 </td>
                 <td>
-                    <a> тут будет проверка </a>
+                     ${url.getName()}
                 </td>
                 <td>
-                    <a> тут будет код </a>
+                     ${url.getName()}
                 </td>
             </tr>
         @endfor
-
         </tbody>
     </table>
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-5">
             <li class="page-item">
                 <a class="page-link" href="?page=${page.getPageNumber() < 2 ? 1 : page.getPageNumber() - 1}"
                    aria-label="Previous">
