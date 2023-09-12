@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 @Slf4j
-public final class App {
+public final class      App {
 
     private static int getPort() {
         String port = System.getenv()
@@ -34,15 +34,14 @@ public final class App {
 
     private static String getMode() {
         String dataBase = System.getenv()
-                .getOrDefault("JDBC_DATABASE_URL"
-                        , "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         return dataBase;
     }
 
 
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
-        app.start(getPort() );
+        app.start(getPort());
     }
 
     private static TemplateEngine createTemplateEngine() {
@@ -84,6 +83,7 @@ public final class App {
         app.get(NamedRoutes.urlsPath(), UrlController::showUrls);
         app.post(NamedRoutes.urlsPath(), UrlController::addUrl);
         app.get(NamedRoutes.urlPath("{id}"), UrlController::showUrl);
+        app.post(NamedRoutes.urlCheckPath("{id}"), UrlController::checkUrl);
 
         return app;
     }

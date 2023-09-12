@@ -29,12 +29,19 @@ content = @`
                 <td>
                     <a href="/urls/${url.getId()}">${url.getName()}</a>
                 </td>
+            @if(url.getUrlChecks() != null)
                 <td>
-                     ${url.getName()}
+                     ${String.valueOf(url.getUrlChecks().get(url.getUrlChecks().size()-1).getCreatedAt())}
                 </td>
                 <td>
-                     ${url.getName()}
+                     ${url.getUrlChecks().get(url.getUrlChecks().size()-1).getStatusCode()}
                 </td>
+                @else
+                <td>
+                </td>
+                <td>
+                </td>
+            @endif
             </tr>
         @endfor
         </tbody>

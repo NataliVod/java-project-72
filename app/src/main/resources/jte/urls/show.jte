@@ -1,8 +1,8 @@
+
 @import hexlet.code.dto.urls.UrlPage
 @import hexlet.code.util.NamedRoutes
 
 @param UrlPage page
-
 
 @template.layout.page(
 page = page,
@@ -29,7 +29,7 @@ content = @`
     </table>
 
     <h2 class="mt-5">Проверки</h2>
-    <form method="post" action="/">
+    <form method="post" action="/urls/${page.getUrl().getId()}/checks">
         <button type="submit" class="btn btn-primary">Запустить проверку</button>
     </form>
 
@@ -43,22 +43,18 @@ content = @`
         <th class="col-2">Дата проверки</th>
         </thead>
         <tbody>
+        @if(page.getUrl().getUrlChecks() != null)
+        @for(var urlCheck : page.getUrl().getUrlChecks())
         <tr>
-            <td>2</td>
-            <td>200</td>
-            <td>Example Domain</td>
-            <td>Example Domain</td>
-            <td></td>
-            <td>02/09/2023 22:08</td>
+            <td>${urlCheck.getId()}</td>
+            <td>${urlCheck.getStatusCode()}</td>
+            <td>${urlCheck.getTitle()}</td>
+            <td>${urlCheck.getH1()}</td>
+            <td>${urlCheck.getDescription()}</td>
+            <td>${String.valueOf(urlCheck.getCreatedAt())}</td>
         </tr>
-        <tr>
-            <td>1</td>
-            <td>200</td>
-            <td>Example Domain</td>
-            <td>Example Domain</td>
-            <td></td>
-            <td>02/09/2023 22:07</td>
-        </tr>
+        @endfor
+        @endif
         </tbody>
     </table>
     </div>

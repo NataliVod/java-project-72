@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +19,9 @@ public class Url {
 
     private Timestamp createdAt;
 
-    public Url() {}
+    private List<UrlCheck> urlChecks;
+
+    public Url() { }
 
 
     public Url(String name, Timestamp createdAt) {
@@ -26,7 +29,7 @@ public class Url {
         this.name = name;
         this.createdAt = createdAt;
 
-        }
+    }
 }
 
 
