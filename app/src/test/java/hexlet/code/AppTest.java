@@ -37,6 +37,7 @@ class AppTest {
                 .setBody("src/test/resources/fixtures/test.html");
         mockWebServer.enqueue(mockedResponse);
         mockWebServer.start();
+        String mockUrl = mockWebServer.url("/").toString();
     }
 
     @AfterAll
@@ -101,12 +102,12 @@ class AppTest {
   /*  public void testCheckUrl() throws Exception {
 
 
-        String baseUrl = mockWebServer.url("/").toString();
-        var url = new Url(baseUrl);
-        UrlRepository.save(url);
+
+
 
         JavalinTest.test(app, (server, client) -> {
-            var response = client.post("/urls/" + url.getId() + "/checks");
+            client.post("/urls", mockUrl);
+            var response = client.post("/urls/1/checks");
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("Погода в Санкт-Петербурге");
             assertThat(response.body().string()).contains("Погода");

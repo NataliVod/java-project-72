@@ -29,6 +29,7 @@ tasks.compileJava {
 
 dependencies {
     implementation("com.h2database:h2:2.2.222")
+    implementation("org.postgresql:postgresql:42.6.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("org.apache.commons:commons-text:1.10.0")
@@ -39,6 +40,7 @@ dependencies {
     implementation("io.javalin:javalin-rendering:5.6.2")
     implementation("com.konghq:unirest-java:3.11.09")
     implementation("org.jsoup:jsoup:1.16.1")
+
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation("org.assertj:assertj-core:3.24.2")

@@ -38,6 +38,12 @@ public final class      App {
         return dataBase;
     }
 
+    private static String getDatabaseUrl() {
+        String dataBase = System.getenv()
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        return dataBase;
+    }
+
 
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
@@ -56,7 +62,7 @@ public final class      App {
         JavalinJte.init(createTemplateEngine());
 
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(getMode());
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
 
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");

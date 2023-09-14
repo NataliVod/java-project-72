@@ -1,6 +1,6 @@
 Page Analyzer – сайт, который анализирует указанные страницы на SEO пригодность.
 
-https://java-project-72-bsy2.onrender.com
+https://page-analyzer-8s47.onrender.com
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/NataliVod/java-project-72/workflows/hexlet-check/badge.svg)](https://github.com/NataliVod/java-project-72/actions)
