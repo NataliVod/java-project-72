@@ -66,7 +66,7 @@ public final class      App {
 
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
-        if (isProduction()){
+        if (isProduction()) {
             String username = System.getenv("JDBC_DATABASE_USERNAME");
             hikariConfig.setUsername(username);
             String password = System.getenv("JDBC_DATABASE_PASSWORD");
@@ -86,7 +86,9 @@ public final class      App {
         BaseRepository.dataSource = dataSource;
 
         var app = Javalin.create(config -> {
-            if (!isProduction()) {config.plugins.enableDevLogging();}
+            if (!isProduction()) {
+                config.plugins.enableDevLogging();
+            }
         });
 
         app.before(ctx -> {
