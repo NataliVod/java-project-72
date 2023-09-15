@@ -27,9 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static hexlet.code.util.ParseUtils.getEmptyIfNull;
-
-
 public  class UrlController {
     public static void addUrl(Context ctx) throws SQLException {
 
@@ -99,18 +96,22 @@ public  class UrlController {
         var statusCode = response.getStatus();
         Document doc = Jsoup.parse(response.getBody());
 
-        String title = getEmptyIfNull(doc.title());
+        String title = "";
+        if (doc.title() != null) {
+            title = doc.title();
+        }
+
 
         String h1 = "";
         Element h1Element = doc.selectFirst("h1");
         if (h1Element != null) {
-            h1 = getEmptyIfNull(h1Element.attr("content"));
+            h1 = h1Element.text();
         }
 
         String description = "";
         Element descElement = doc.selectFirst("meta[name=description]");
         if (descElement != null) {
-            description = getEmptyIfNull(descElement.attr("content"));
+            description = descElement.attr("content");
         }
 
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());

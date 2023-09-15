@@ -23,7 +23,6 @@ public class Url {
 
     public Url() { }
 
-
     public Url(String name, Timestamp createdAt) {
 
         this.name = name;

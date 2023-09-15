@@ -33,9 +33,13 @@ public final class      App {
     }
 
     private static String getMode() {
-        String dataBase = System.getenv()
-                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
-        return dataBase;
+        String mode = System.getenv()
+                .getOrDefault("APP_ENV", "development");
+        return mode;
+    }
+
+    private static boolean isProduction() {
+        return getMode().equals("production");
     }
 
     private static String getDatabaseUrl() {
@@ -43,7 +47,6 @@ public final class      App {
                 .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
         return dataBase;
     }
-
 
     public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
@@ -63,7 +66,12 @@ public final class      App {
 
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
-
+        if (isProduction()){
+            String username = System.getenv("JDBC_DATABASE_USERNAME");
+            hikariConfig.setUsername(username);
+            String password = System.getenv("JDBC_DATABASE_PASSWORD");
+            hikariConfig.setPassword(password);
+        }
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");
         var file = new File(url.getFile());
@@ -78,7 +86,7 @@ public final class      App {
         BaseRepository.dataSource = dataSource;
 
         var app = Javalin.create(config -> {
-            config.plugins.enableDevLogging();
+            if (!isProduction()) {config.plugins.enableDevLogging();}
         });
 
         app.before(ctx -> {

@@ -15,6 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,21 +27,21 @@ class AppTest {
 
     private static Javalin app;
     private static MockWebServer mockWebServer;
+    private static String mockUrl;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        app = App.getApp();
-    }
 
     @BeforeAll
-
-    public static void beforeAll() throws IOException {
+    public static void beforeAll() throws IOException, SQLException {
         mockWebServer = new MockWebServer();
+        Path path  = Paths.get("src/test/resources/fixtures/test.html").toAbsolutePath().normalize();
         MockResponse mockedResponse = new MockResponse()
-                .setBody("src/test/resources/fixtures/test.html");
+                .setBody(Files.readString(path));
         mockWebServer.enqueue(mockedResponse);
         mockWebServer.start();
-        String mockUrl = mockWebServer.url("/").toString();
+        mockUrl = mockWebServer.url("/").toString();
+
+        app = App.getApp();
+        app.start();
     }
 
     @AfterAll
@@ -67,7 +71,7 @@ class AppTest {
     @Test
     public void testUrlPage() throws Exception {
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-        var url = new Url("www.example.com", createdAt);
+        var url = new Url(mockUrl, createdAt);
         UrlRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());
@@ -78,10 +82,10 @@ class AppTest {
     @Test
     public void testCreateUrl() throws Exception {
         JavalinTest.test(app, (server, client) -> {
-            var requestBody = "name=www.example.com";
+            var requestBody = mockUrl;
             var response = client.post("/urls", requestBody);
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("www.example.com");
+            assertThat(response.body().string()).contains(mockUrl);
             assertThat(response.body().string()).contains("Страница успешно добавлена");
         });
 
