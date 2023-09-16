@@ -11,9 +11,11 @@ import okhttp3.mockwebserver.MockWebServer;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,9 +26,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AppTest {
 
-    private static Javalin app;
+
     private static MockWebServer mockWebServer;
     private static String mockUrl;
+
+    Javalin app;
+
+    @BeforeEach
+    public final void setUp() throws IOException, SQLException {
+        app = App.getApp();
+    }
 
 
     @BeforeAll
@@ -39,14 +48,11 @@ class AppTest {
         mockWebServer.start();
         mockUrl = mockWebServer.url("/").toString();
 
-        app = App.getApp();
-        app.start();
     }
 
     @AfterAll
     public static void afterAll() throws IOException {
         mockWebServer.shutdown();
-        app.stop();
     }
 
     @Test
@@ -101,23 +107,28 @@ class AppTest {
 
     }
 
-   // @Test
-  /*  public void testCheckUrl() throws Exception {
+    @Test
+    public void testCheckUrl() throws Exception {
+        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+        var url = new Url(mockUrl, createdAt);
+        UrlRepository.save(url);
 
+        String str = "Погода в Санкт-Петербурге";
+        Charset charset = Charset.forName("UTF-8");
 
-
-
+        byte[] bytes = str.getBytes(charset);
 
         JavalinTest.test(app, (server, client) -> {
-            client.post("/urls", mockUrl);
-            var response = client.post("/urls/1/checks");
+
+            var response = client.post("/urls/" + url.getId() + "/checks");
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("Погода в Санкт-Петербурге");
+
+            assertThat(response.body().string()).contains(bytes.toString());
             assertThat(response.body().string()).contains("Погода");
             assertThat(response.body().string()).contains("Текущая погода и точный прогноз");
             assertThat(response.body().string()).contains("Страница успешно проверена");
         });
 
-    } */
+    }
 
 }
