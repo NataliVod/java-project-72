@@ -113,17 +113,12 @@ class AppTest {
         var url = new Url(mockUrl, createdAt);
         UrlRepository.save(url);
 
-        String str = "Погода в Санкт-Петербурге";
-        Charset charset = Charset.forName("UTF-8");
-
-        byte[] bytes = str.getBytes(charset);
-
         JavalinTest.test(app, (server, client) -> {
 
             var response = client.post("/urls/" + url.getId() + "/checks");
             assertThat(response.code()).isEqualTo(200);
 
-            assertThat(response.body().string()).contains(bytes.toString());
+            assertThat(response.body().string()).contains("Погода в Санкт-Петербурге");
             assertThat(response.body().string()).contains("Погода");
             assertThat(response.body().string()).contains("Текущая погода и точный прогноз");
             assertThat(response.body().string()).contains("Страница успешно проверена");
