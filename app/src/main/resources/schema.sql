@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS urls_checks;
 DROP TABLE IF EXISTS urls;
 
 CREATE TABLE urls (
@@ -6,7 +7,7 @@ CREATE TABLE urls (
     created_at                 TIMESTAMP NOT NULL
 );
 
-DROP TABLE IF EXISTS urls_checks;
+
 
 CREATE TABLE url_checks (
   id                            BIGINT PRIMARY KEY AUTO_INCREMENT,
