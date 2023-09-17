@@ -73,8 +73,12 @@ public final class      App {
             hikariConfig.setPassword(password);
         }
         var dataSource = new HikariDataSource(hikariConfig);
-        var url = App.class.getClassLoader().getResource("schema.sql");
-        var file = new File(url.getFile());
+
+        ClassLoader classLoader = App.class.getClassLoader();
+        File file = new File(classLoader.getResource("schema.sql").getFile());
+
+      //  var url = App.class.getClassLoader().getResource("schema.sql");
+       // var file = new File(url.getFile());
         var sql = Files.lines(file.toPath())
                 .collect(Collectors.joining("\n"));
 
