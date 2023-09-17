@@ -17,8 +17,10 @@ import io.javalin.rendering.template.JavalinJte;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
@@ -74,11 +76,15 @@ public final class      App {
         }
         var dataSource = new HikariDataSource(hikariConfig);
 
-        File file = new File(App.class.getClassLoader().getResource("schema.sql").getFile());
-       // var url = App.class.getClassLoader().getResource("schema.sql");
-       // var file = new File(url.getFile());
-        var sql = Files.lines(file.toPath())
-                .collect(Collectors.joining("\n"));
+        var inputStream = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        var reader = new BufferedReader(new InputStreamReader(inputStream));
+        var sql = reader.lines().collect(Collectors.joining("\n"));
+
+
+        // var url = App.class.getClassLoader().getResource("schema.sql");
+        //var file = new File(url.getFile());
+        // var sql = Files.lines(file.toPath())
+        //       .collect(Collectors.joining("\n"));
 
         log.info(sql);
         try (var connection = dataSource.getConnection();
