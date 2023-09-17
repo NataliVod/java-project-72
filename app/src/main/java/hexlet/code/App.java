@@ -74,10 +74,8 @@ public final class      App {
         }
         var dataSource = new HikariDataSource(hikariConfig);
 
-        ClassLoader classLoader = App.class.getClassLoader();
-        File file = new File(classLoader.getResource("schema.sql").getFile());
-
-      //  var url = App.class.getClassLoader().getResource("schema.sql");
+        File file = new File(App.class.getClassLoader().getResource("schema.sql").getFile());
+       // var url = App.class.getClassLoader().getResource("schema.sql");
        // var file = new File(url.getFile());
         var sql = Files.lines(file.toPath())
                 .collect(Collectors.joining("\n"));
