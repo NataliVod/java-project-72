@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS urls_checks;
 DROP TABLE IF EXISTS urls;
 
 CREATE TABLE urls (
-    id                         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id                         SERIAL PRIMARY KEY,
     name                       VARCHAR(255) NOT NULL,
     created_at                 TIMESTAMP NOT NULL
 );
@@ -10,7 +10,7 @@ CREATE TABLE urls (
 
 
 CREATE TABLE url_checks (
-  id                            BIGINT PRIMARY KEY AUTO_INCREMENT,
+  id                            SERIAL PRIMARY KEY,
   status_code                   INTEGER NOT NULL,
   title                         VARCHAR(255),
   h1                            VARCHAR(255),
