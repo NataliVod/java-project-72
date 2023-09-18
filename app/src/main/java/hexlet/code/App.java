@@ -78,12 +78,6 @@ public final class      App {
         var reader = new BufferedReader(new InputStreamReader(inputStream));
         var sql = reader.lines().collect(Collectors.joining("\n"));
 
-
-        // var url = App.class.getClassLoader().getResource("schema.sql");
-        //var file = new File(url.getFile());
-        // var sql = Files.lines(file.toPath())
-        //       .collect(Collectors.joining("\n"));
-
         log.info(sql);
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {

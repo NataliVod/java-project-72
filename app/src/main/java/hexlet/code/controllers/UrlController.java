@@ -36,9 +36,10 @@ public  class UrlController {
                    .get();
 
             URL parsedUrl = new URL(inputUrl);
-            var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost();
+            var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + ":" + parsedUrl.getPort();
 
             if (UrlRepository.existsByName(normalizedUrl)) {
+                ctx.status(409);
                 ctx.sessionAttribute("flash", "Страница уже существует");
                 ctx.sessionAttribute("flash-type", "info");
                 ctx.redirect(NamedRoutes.urlsPath());
@@ -53,6 +54,7 @@ public  class UrlController {
             ctx.redirect(NamedRoutes.urlsPath());
 
         } catch (Exception e) {
+            ctx.status(400);
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect(NamedRoutes.rootPath());
