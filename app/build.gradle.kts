@@ -42,6 +42,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.16.1")
 
 
+
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
@@ -62,6 +63,6 @@ tasks.test {
             showStandardStreams = true
 
     }
-
+    finalizedBy("jacocoTestReport")
 }
 
