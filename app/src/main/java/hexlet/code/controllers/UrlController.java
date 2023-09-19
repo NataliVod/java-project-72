@@ -36,7 +36,14 @@ public  class UrlController {
                    .get();
 
             URL parsedUrl = new URL(inputUrl);
-            var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + ":" + parsedUrl.getPort();
+
+            var port = "";
+            var portNumber = parsedUrl.getPort();
+            if(portNumber != -1) {
+                port = ":" + portNumber;
+            }
+
+            var normalizedUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + port;
 
             if (UrlRepository.existsByName(normalizedUrl)) {
                 ctx.status(409);
@@ -72,6 +79,14 @@ public  class UrlController {
                 .limit(per)
                 .collect(Collectors.toList());
 
+        pagedUrls.forEach(url -> {
+            try {
+                url.setLastCheck(UrlCheckRepository.getLastCheck(url.getId()));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         var page = new UrlsPage(pagedUrls, pageNumber);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
@@ -82,8 +97,10 @@ public  class UrlController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
         var urlChecks = UrlCheckRepository.getEntities(id);
         url.setUrlChecks(urlChecks);
+
         var page = new UrlPage(url);
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }

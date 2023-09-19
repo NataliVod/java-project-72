@@ -21,6 +21,8 @@ public class Url {
 
     private List<UrlCheck> urlChecks;
 
+    private UrlCheck lastCheck;
+
     public Url() { }
 
     public Url(String name, Timestamp createdAt) {

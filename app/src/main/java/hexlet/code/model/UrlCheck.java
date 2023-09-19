@@ -30,4 +30,8 @@ public class UrlCheck {
         this.urlId = urlId;
     }
 
+    public UrlCheck() {
+
+    }
+
 }

@@ -108,7 +108,7 @@ class AppTest {
 
             var urlChecks = UrlCheckRepository.getEntities(url.getId());
             url.setUrlChecks(urlChecks);
-            var urlCheck = urlChecks.get(urlChecks.size() - 1);
+            var urlCheck = UrlCheckRepository.getLastCheck(url.getId());
 
             String actualTitle = urlCheck.getTitle();
             String actualH1 = urlCheck.getH1();
