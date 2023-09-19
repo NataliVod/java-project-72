@@ -59,7 +59,7 @@ public class UrlCheckRepository extends BaseRepository {
         }
 
     }
-
+// это нормально извлекать последние проверки по одной?
     public static UrlCheck getLastCheck(Long urlId) throws SQLException {
         var sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC LIMIT 1";
         try (var conn = dataSource.getConnection();
