@@ -5,9 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class UrlCheckRepository extends BaseRepository {
 
@@ -62,7 +60,7 @@ public class UrlCheckRepository extends BaseRepository {
 
     }
 
-        public static UrlCheck getLastCheck(Long urlId) throws SQLException {
+    public static UrlCheck getLastCheck(Long urlId) throws SQLException {
         var sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC LIMIT 1";
         try (var conn = dataSource.getConnection();
 

@@ -39,7 +39,7 @@ public  class UrlController {
 
             var port = "";
             var portNumber = parsedUrl.getPort();
-            if(portNumber != -1) {
+            if (portNumber != -1) {
                 port = ":" + portNumber;
             }
 
