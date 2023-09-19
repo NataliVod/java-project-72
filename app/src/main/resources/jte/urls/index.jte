@@ -29,7 +29,7 @@ content = @`
                 <td>
                     <a href="/urls/${url.getId()}">${url.getName()}</a>
                 </td>
-            @if(url.getLastCheck() != null)
+            @if((url.getLastCheck() != null) && (url.getLastCheck().getCreatedAt() != null))
                 <td>
                      ${String.valueOf(url.getLastCheck().getCreatedAt())}
                 </td>
