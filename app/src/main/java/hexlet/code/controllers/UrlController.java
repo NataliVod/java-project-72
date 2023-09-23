@@ -1,6 +1,5 @@
 package hexlet.code.controllers;
 
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
