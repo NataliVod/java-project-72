@@ -1,5 +1,6 @@
 package hexlet.code.controllers;
 
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -27,13 +28,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public  class UrlController {
+public class UrlController {
     public static void addUrl(Context ctx) throws SQLException {
 
         try {
             var inputUrl = ctx.formParamAsClass("url", String.class)
-                   .check(value -> !value.isEmpty(), "Заполните это поле")
-                   .get();
+                    .check(value -> !value.isEmpty(), "Заполните это поле")
+                    .get();
 
             URL parsedUrl = new URL(inputUrl);
 
@@ -102,6 +103,8 @@ public  class UrlController {
         url.setUrlChecks(urlChecks);
 
         var page = new UrlPage(url);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
@@ -109,39 +112,38 @@ public  class UrlController {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(urlId)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
-
-        HttpResponse<String> response = Unirest.get(url.getName()).asString();
-
-        var statusCode = response.getStatus();
-        Document doc = Jsoup.parse(response.getBody());
-
-        String title = "";
-        if (doc.title() != null) {
-            title = doc.title();
+        try {
+            HttpResponse<String> response = Unirest.get(url.getName()).asString();
+            var statusCode = response.getStatus();
+            Document doc = Jsoup.parse(response.getBody());
+            String title = "";
+            if (doc.title() != null) {
+                title = doc.title();
+            }
+            String h1 = "";
+            Element h1Element = doc.selectFirst("h1");
+            if (h1Element != null) {
+                h1 = h1Element.text();
+            }
+            String description = "";
+            Element descElement = doc.selectFirst("meta[name=description]");
+            if (descElement != null) {
+                description = descElement.attr("content");
+            }
+            Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+            var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
+            UrlCheckRepository.save(urlCheck);
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", "Страница не найдена");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
         }
-
-
-        String h1 = "";
-        Element h1Element = doc.selectFirst("h1");
-        if (h1Element != null) {
-            h1 = h1Element.text();
-        }
-
-        String description = "";
-        Element descElement = doc.selectFirst("meta[name=description]");
-        if (descElement != null) {
-            description = descElement.attr("content");
-        }
-
-        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
-        var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
-        UrlCheckRepository.save(urlCheck);
-
-        ctx.sessionAttribute("flash", "Страница успешно проверена");
-        ctx.sessionAttribute("flash-type", "success");
-        ctx.redirect(NamedRoutes.urlPath(urlId));
     }
 
 
 }
+
+
