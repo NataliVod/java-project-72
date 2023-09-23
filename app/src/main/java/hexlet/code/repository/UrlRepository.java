@@ -68,6 +68,10 @@ public class    UrlRepository extends BaseRepository {
         return findByName(name) != null;
     }
 
+    public static boolean existsById(Long id) throws SQLException {
+        return find(id) != null;
+    }
+
     public static List<Url> getEntities() throws SQLException {
         var sql = "SELECT * FROM urls";
         try (var conn = dataSource.getConnection();

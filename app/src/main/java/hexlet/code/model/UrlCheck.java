@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @ToString
-
 public class UrlCheck {
     private Long id;
     private Integer statusCode;

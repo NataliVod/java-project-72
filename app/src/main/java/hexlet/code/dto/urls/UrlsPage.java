@@ -9,7 +9,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-
 public class   UrlsPage extends BasePage {
     private List<Url> urls;
     private int pageNumber;
