@@ -50,6 +50,7 @@ public class UrlController {
                 ctx.sessionAttribute("flash", "Страница уже существует");
                 ctx.sessionAttribute("flash-type", "info");
                 ctx.redirect(NamedRoutes.urlsPath());
+                return;
             }
 
             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
@@ -136,7 +137,7 @@ public class UrlController {
             ctx.sessionAttribute("flash-type", "success");
             ctx.redirect(NamedRoutes.urlPath(urlId));
         } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Страница не найдена");
+            ctx.sessionAttribute("flash", e.getMessage());
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect(NamedRoutes.urlPath(urlId));
         }

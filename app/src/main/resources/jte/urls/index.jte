@@ -1,5 +1,6 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import hexlet.code.util.NamedRoutes
+@import java.time.format.DateTimeFormatter
 
 @param UrlsPage page
 
@@ -31,7 +32,7 @@ content = @`
                 </td>
             @if((url.getLastCheck() != null) && (url.getLastCheck().getCreatedAt() != null))
                 <td>
-                     ${String.valueOf(url.getLastCheck().getCreatedAt())}
+                    ${url.getLastCheck().getCreatedAt().toLocalDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))}
                 </td>
                 <td>
                      ${url.getLastCheck().getStatusCode()}
